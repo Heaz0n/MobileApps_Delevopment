@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:math_expressions/math_expressions.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -11,206 +11,204 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Calculator',
+      title: 'Калькулятор',
       theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const Calculator(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Calculator extends StatefulWidget {
+  const Calculator({super.key});
 
   @override
-  State createState() => HomePageState();
+  State<Calculator> createState() => CalculatorState();
 }
 
-class HomePageState extends State<HomePage> {
-  String expression = "";
-  String result = "";
-  String errorMessage = "";
-  String activeButton = "";
-  bool justCalculated = false;
+class CalculatorState extends State<Calculator> {
+  String displayText = '0';
+  String selectedOperator = '';
+  double firstOperand = 0.0;
 
-  void calculateResult() {
-    try {
-      String finalExpression = expression.replaceAll('X', '*');
-
-      // Обработка квадратного корня
-      if (finalExpression.contains('√')) {
-        finalExpression = finalExpression.replaceAll('√', 'sqrt');
-      }
-
-      // Обработка факториала
-      if (finalExpression.contains('!')) {
-        finalExpression = handleFactorial(finalExpression);
-      }
-
-      Parser parser = Parser();
-      Expression exp = parser.parse(finalExpression);
-      ContextModel cm = ContextModel();
-      double eval = exp.evaluate(EvaluationType.REAL, cm);
-
-      result = eval.toString();
-      justCalculated = true;
-
-      if (result.length > 10) {
-        result = result.substring(0, 10);
-      }
-    } catch (e) {
-      errorMessage = "Ошибка!";
-      setState(() {});
-    }
-  }
-
-  // Функция для обработки факториала
-  String handleFactorial(String expression) {
-    RegExp regex = RegExp(r'(\d+)!'); // Поиск числа перед символом "!"
-    return expression.replaceAllMapped(regex, (match) {
-      int num = int.parse(match.group(1)!);
-      return factorial(num).toString();
-    });
-  }
-
-  // Вычисление факториала
-  int factorial(int n) {
-    if (n <= 1) {
-      return 1;
-    } else {
-      return n * factorial(n - 1);
-    }
-  }
-
-  void buttonPressed(String key) {
+  void onButtonClick(String label) {
     setState(() {
-      activeButton = key;
-
-      if (justCalculated) {
-        if ("0123456789".contains(key)) {
-          expression = key;
-          result = "";
-        } else if ("+-X/^%√!".contains(key)) {
-          expression = result + key;
-        } else if (key == "=") {
-          expression = result;
-          calculateResult();
-        }
-        justCalculated = false;
-      } else if (key == "=") {
-        calculateResult();
-      } else if (key == "AC") {
-        resetCalculator();
-      } else if (key == "C") {
-        clearLastEntry();
-      } else {
-        expression += key;
+      switch (label) {
+        case '=':
+          performCalculation();
+          break;
+        case 'C':
+          displayText = '0';
+          resetOperator();
+          break;
+        case '<':
+          removeLastCharacter();
+          break;
+        case '√':
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '^':
+          chooseOperator(label);
+          break;
+        case '.':
+          addDecimalPoint();
+          break;
+        default:
+          appendNumber(label);
+          break;
       }
-
-      Future.delayed(const Duration(milliseconds: 50), () {
-        setState(() {
-          activeButton = "";
-        });
-      });
     });
   }
 
-  void resetCalculator() {
-    expression = "";
-    result = "";
-    errorMessage = "";
-    justCalculated = false;
+  void appendNumber(String number) {
+    if (displayText == '0' || displayText == 'Нельзя делить на ноль') {
+      displayText = number;
+    } else {
+      displayText += number;
+    }
   }
 
-  void clearLastEntry() {
-    if (expression.isNotEmpty) {
-      expression = expression.substring(0, expression.length - 1);
-    } else {
-      resetCalculator();
+  void addDecimalPoint() {
+    if (!displayText.contains('.')) {
+      displayText += '.';
     }
+  }
+
+  void chooseOperator(String newOperator) {
+    if (selectedOperator.isNotEmpty) {
+      performCalculation();
+    }
+    firstOperand = parseDisplayText(displayText);
+    selectedOperator = newOperator;
+    displayText += ' $newOperator ';
+  }
+
+  void performCalculation() {
+    if (selectedOperator.isEmpty) return;
+
+    List<String> components = displayText.split(' ');
+
+    // Обработка корня
+    if (selectedOperator == '√') {
+      double result = sqrt(firstOperand);
+      displayText = result.toString();
+      resetOperator();
+      return;
+    }
+
+    if (components.length < 3) return;
+
+    double secondOperand = parseDisplayText(components[2]);
+
+    switch (selectedOperator) {
+      case '+':
+        displayText = (firstOperand + secondOperand).toString();
+        break;
+      case '-':
+        displayText = (firstOperand - secondOperand).toString();
+        break;
+      case '*':
+        displayText = (firstOperand * secondOperand).toString();
+        break;
+      case '/':
+        displayText = secondOperand == 0
+            ? 'Нельзя делить на ноль'
+            : (firstOperand / secondOperand).toString();
+        break;
+      case '^':
+        if (components.length >= 3 && components[2].isNotEmpty) {
+          displayText = pow(firstOperand, secondOperand).toString();
+        }
+        break;
+    }
+    resetOperator();
+  }
+
+  void removeLastCharacter() {
+    if (displayText.length > 1) {
+      displayText = displayText.substring(0, displayText.length - 1);
+    } else {
+      displayText = '0';
+    }
+  }
+
+  double parseDisplayText(String text) {
+    if (text.isEmpty) {
+      return 0.0; // Возвращаем 0.0 для устранения ошибок
+    }
+    return double.parse(text);
+  }
+
+  void resetOperator() {
+    selectedOperator = '';
+    firstOperand = 0.0;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Calculator"),
-        backgroundColor: Colors.lightBlueAccent,
+        title: const Text('Калькулятор'),
+        backgroundColor: Colors.blueAccent,
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              alignment: Alignment.bottomRight,
-              padding: const EdgeInsets.all(20.0),
-              child: Text(
-                expression,
-                style: const TextStyle(
-                  fontSize: 30.0,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              alignment: Alignment.bottomRight,
-              padding: const EdgeInsets.all(20.0),
-              child: Text(
-                errorMessage.isEmpty ? result : errorMessage,
-                style: const TextStyle(fontSize: 50.0, color: Colors.black),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: GridView.count(
-              crossAxisCount: 4,
-              padding: const EdgeInsets.all(10),
-              children: <Widget>[
-                buildButton("AC", color: Colors.redAccent),
-                buildButton("C", color: Colors.redAccent),
-                buildButton("%", color: Colors.deepOrangeAccent),
-                buildButton("/", color: Colors.deepOrangeAccent),
-                buildButton("7"),
-                buildButton("8"),
-                buildButton("9"),
-                buildButton("X", color: Colors.deepOrangeAccent),
-                buildButton("4"),
-                buildButton("5"),
-                buildButton("6"),
-                buildButton("-", color: Colors.deepOrangeAccent),
-                buildButton("1"),
-                buildButton("2"),
-                buildButton("3"),
-                buildButton("+", color: Colors.deepOrangeAccent),
-                buildButton("0"),
-                buildButton("."),
-                buildButton("√", color: Colors.deepOrangeAccent),
-                buildButton("=", color: Colors.green),
-              ],
-            ),
-          ),
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          buildDisplay(),
+          buildButtonRow(['C', '√', '^', '/'], Colors.deepOrange),
+          buildButtonRow(['7', '8', '9', '*'], Colors.green),
+          buildButtonRow(['4', '5', '6', '-'], Colors.blueAccent),
+          buildButtonRow(['1', '2', '3', '+'], Colors.redAccent),
+          buildButtonRow(['0', '.', '<', '='], Colors.deepPurpleAccent),
         ],
       ),
     );
   }
 
-  Widget buildButton(String label, {Color color = Colors.grey}) {
-    return MaterialButton(
-      height: 90.0,
-      color: activeButton == label ? Colors.blueGrey : color,
-      textColor: Colors.black,
-      onPressed: () => buttonPressed(label),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(45.0), // Радиус закругления кнопок
+  Widget buildDisplay() {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        alignment: Alignment.bottomRight,
+        child: Text(
+          displayText,
+          style: const TextStyle(
+            fontSize: 48.0,
+            color: Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildButtonRow(List<String> labels, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: labels.map((label) => buildButton(label, color)).toList(),
+      ),
+    );
+  }
+
+  Widget buildButton(String label, Color color) {
+    return ElevatedButton(
+      onPressed: () => onButtonClick(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        minimumSize: const Size(80, 80),
+        shape: const CircleBorder(),
+        textStyle: const TextStyle(fontSize: 24.0),
       ),
       child: Text(
         label,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+        style: const TextStyle(
+          fontSize: 24.0,
+          color: Colors.white,
+        ),
       ),
     );
   }
