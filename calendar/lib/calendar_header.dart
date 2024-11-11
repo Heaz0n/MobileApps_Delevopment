@@ -26,11 +26,11 @@ class CalendarHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.blueAccent),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: onPreviousMonth,
           ),
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.blueAccent),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: onPreviousYear,
           ),
           Text(
@@ -42,11 +42,11 @@ class CalendarHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
+            icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
             onPressed: onNextYear,
           ),
           IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
+            icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
             onPressed: onNextMonth,
           ),
         ],

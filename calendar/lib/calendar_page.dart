@@ -86,7 +86,7 @@ class CalendarPageState extends State<CalendarPage> {
               currentMonth.year != DateTime.now().year)
           ? FloatingActionButton(
               onPressed: goToCurrentMonth,
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Colors.white,
               child: const Icon(Icons.today, color: Colors.blueGrey),
             )
           : null,

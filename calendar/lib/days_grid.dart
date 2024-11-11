@@ -42,15 +42,15 @@ class DaysGrid extends StatelessWidget {
             margin: const EdgeInsets.all(4.0),
             decoration: BoxDecoration(
               color: isSelected
-                  ? Colors.blueAccent
+                  ? Colors.white
                   : isToday
-                      ? Colors.blueAccent
+                      ? Colors.white
                       : Colors.blueGrey,
               borderRadius: BorderRadius.circular(6.0),
               boxShadow: isSelected || isToday
                   ? [
                       BoxShadow(
-                        color: Colors.tealAccent.withOpacity(0.5),
+                        color: Colors.white.withOpacity(0),
                         blurRadius: 6,
                         spreadRadius: 2,
                       )

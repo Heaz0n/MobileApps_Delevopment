@@ -17,7 +17,7 @@ class WeekDaysRow extends StatelessWidget {
                     day,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Colors.white,
                       fontSize: 16,
                     ),
                   ),

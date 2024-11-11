@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Календарь',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
         scaffoldBackgroundColor: Colors.blueGrey[800],
         brightness: Brightness.dark,
       ),
