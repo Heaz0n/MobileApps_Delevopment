@@ -57,9 +57,14 @@ class CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: const Text(
           'Календарь',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.cyanAccent,
+            shadows: [Shadow(blurRadius: 4, color: Colors.cyan)],
+          ),
         ),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.indigo[900],
         centerTitle: true,
       ),
       body: Column(
@@ -86,8 +91,8 @@ class CalendarPageState extends State<CalendarPage> {
               currentMonth.year != DateTime.now().year)
           ? FloatingActionButton(
               onPressed: goToCurrentMonth,
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.today, color: Colors.blueGrey),
+              backgroundColor: Colors.cyanAccent,
+              child: const Icon(Icons.today, color: Colors.indigo),
             )
           : null,
     );

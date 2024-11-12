@@ -18,39 +18,38 @@ class DaysGrid extends StatelessWidget {
     int firstDayOffset =
         DateTime(currentMonth.year, currentMonth.month, 1).weekday - 1;
 
-    List<Widget> daysList = [];
-
-    for (int i = 0; i < firstDayOffset; i++) {
-      daysList.add(const SizedBox.shrink());
-    }
+    List<Widget> daysList =
+        List.generate(firstDayOffset, (index) => const SizedBox.shrink());
 
     for (int day = 1; day <= totalDays; day++) {
       DateTime currentDay =
           DateTime(currentMonth.year, currentMonth.month, day);
-      bool isToday = currentDay.day == DateTime.now().day &&
-          currentDay.month == DateTime.now().month &&
-          currentDay.year == DateTime.now().year;
-      bool isSelected = selectedDate != null &&
-          selectedDate!.year == currentDay.year &&
-          selectedDate!.month == currentDay.month &&
-          selectedDate!.day == currentDay.day;
+      DateTime today = DateTime.now();
+      bool isToday = currentDay.year == today.year &&
+          currentDay.month == today.month &&
+          currentDay.day == today.day;
+      bool isSelected =
+          selectedDate != null && selectedDate!.isAtSameMomentAs(currentDay);
 
       daysList.add(
         GestureDetector(
           onTap: () => onDateSelected(currentDay),
           child: Container(
-            margin: const EdgeInsets.all(4.0),
+            margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: isSelected
-                  ? Colors.white
+                  ? Colors.cyanAccent
                   : isToday
-                      ? Colors.white
-                      : Colors.blueGrey,
-              borderRadius: BorderRadius.circular(6.0),
-              boxShadow: isSelected || isToday
+                      ? Colors.blueAccent.withOpacity(0.3)
+                      : Colors.indigo[900],
+              borderRadius: BorderRadius.circular(6),
+              border: isToday
+                  ? Border.all(color: Colors.cyanAccent, width: 2)
+                  : null,
+              boxShadow: isSelected
                   ? [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0),
+                      const BoxShadow(
+                        color: Colors.cyanAccent,
                         blurRadius: 6,
                         spreadRadius: 2,
                       )
@@ -61,7 +60,9 @@ class DaysGrid extends StatelessWidget {
               child: Text(
                 '$day',
                 style: TextStyle(
-                  color: isSelected || isToday ? Colors.blueGrey : Colors.white,
+                  color: isSelected || isToday
+                      ? Colors.indigo[900]
+                      : Colors.cyanAccent,
                   fontWeight: isSelected || isToday
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -76,7 +77,7 @@ class DaysGrid extends StatelessWidget {
     return GridView.count(
       crossAxisCount: 7,
       shrinkWrap: true,
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       physics: const NeverScrollableScrollPhysics(),
       children: daysList,
     );

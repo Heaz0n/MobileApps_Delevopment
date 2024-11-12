@@ -13,11 +13,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Календарь',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        scaffoldBackgroundColor: Colors.blueGrey[800],
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: Colors.blueGrey,
         brightness: Brightness.dark,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.cyanAccent),
+          bodyMedium: TextStyle(color: Colors.cyanAccent),
+        ),
       ),
-      home: CalendarPage(),
+      home: const CalendarPage(),
     );
   }
 }

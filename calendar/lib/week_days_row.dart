@@ -1,31 +1,39 @@
 import 'package:flutter/material.dart';
 
 class WeekDaysRow extends StatelessWidget {
-  final List<String> weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const WeekDaysRow({super.key});
+
+  Color getSeasonColor(DateTime currentMonth) {
+    int month = currentMonth.month;
+    if (month == 12 || month == 1 || month == 2) {
+      return Colors.blueAccent; // Зима
+    } else if (month == 3 || month == 4 || month == 5) {
+      return Colors.greenAccent; // Весна
+    } else if (month == 6 || month == 7 || month == 8) {
+      return Colors.yellowAccent; // Лето
+    } else {
+      return Colors.orangeAccent; // Осень
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: weekDays
-            .map(
-              (day) => Expanded(
-                child: Center(
-                  child: Text(
-                    day,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            )
-            .toList(),
-      ),
+    DateTime currentMonth = DateTime.now(); // текущий месяц
+
+    List<String> weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: weekdays.map((day) {
+        return Text(
+          day,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: getSeasonColor(currentMonth),
+          ),
+        );
+      }).toList(),
     );
   }
 }
