@@ -10,7 +10,7 @@ class WeatherScreen extends StatefulWidget {
 }
 
 class WeatherScreenState extends State<WeatherScreen> {
-  final String apiKey = '02b7d0bbf02440eb998155657242711';
+  final String apiKey = '1e2ec7ea29464c4591a134603242911';
   final List<String> cities = [
     'Moscow',
     'Sochi',
@@ -45,18 +45,25 @@ class WeatherScreenState extends State<WeatherScreen> {
   Future<void> fetchWeatherData(String city) async {
     final url = Uri.parse(
         'https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$city&days=7');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          currentWeatherData = data;
+          dailyForecastData = data['forecast']['forecastday'];
+        });
+      } else {
+        print('Ошибка API: ${response.body}');
+        setState(() {
+          errorMessage =
+              "Ошибка ${response.statusCode}: ${response.reasonPhrase}";
+        });
+      }
+    } catch (e) {
+      print('Сетевая ошибка: $e');
       setState(() {
-        currentWeatherData = data;
-        dailyForecastData = data['forecast']['forecastday'];
-      });
-    } else {
-      setState(() {
-        errorMessage =
-            "Что-то пошло не так... или это просто погода решила быть непредсказуемой!";
+        errorMessage = "Ошибка подключения: $e";
       });
     }
   }
