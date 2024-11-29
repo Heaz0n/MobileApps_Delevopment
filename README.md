@@ -5,3 +5,15 @@
 Клонировать репозиторий
 
     git clone https://github.com/Heaz0n/MobileApps_Delevopment.git
+
+Выбрать указанную папку
+
+    cd <название_папки>
+
+Уставновка зависимостей
+
+    flutter pub get
+
+Запуск приложения
+
+    flutter run
